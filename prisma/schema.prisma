@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // bcrypt hashed
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id          String    @id @default(cuid())
+  name        String
+  latitude    Float
+  longitude   Float
+  elevation   Float?    // elevation from sea level in meters
+  imageryDate DateTime?
+  state       String    // Malaysian state
+  description String?   // optional description
+  images      Image[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([state])
+  @@index([name])
+}
+
+model Image {
+  id         String   @id @default(cuid())
+  publicId   String   // Cloudinary public ID
+  url        String   // Full Cloudinary URL
+  width      Int?
+  height     Int?
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([locationId])
+}
