@@ -1,6 +1,9 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
+// Use Node.js runtime to avoid Edge function size limits
+export const runtime = "nodejs";
+
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
