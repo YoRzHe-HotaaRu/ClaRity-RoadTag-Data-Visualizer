@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
             latitude,
             longitude,
             elevation,
+            roadLength,
+            roadWidth,
             imageryDate,
             state,
             description,
@@ -68,12 +70,41 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const lat = parseFloat(latitude);
+        const lng = parseFloat(longitude);
+
+        // Check for duplicate coordinates (within ~10 meter tolerance)
+        const tolerance = 0.0001; // approximately 11 meters
+        const existingLocation = await prisma.location.findFirst({
+            where: {
+                AND: [
+                    { latitude: { gte: lat - tolerance, lte: lat + tolerance } },
+                    { longitude: { gte: lng - tolerance, lte: lng + tolerance } },
+                ],
+            },
+        });
+
+        if (existingLocation) {
+            return NextResponse.json(
+                {
+                    error: `A location already exists at these coordinates: "${existingLocation.name}"`,
+                    existingLocation: {
+                        id: existingLocation.id,
+                        name: existingLocation.name,
+                    }
+                },
+                { status: 409 }
+            );
+        }
+
         const location = await prisma.location.create({
             data: {
                 name,
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
+                latitude: lat,
+                longitude: lng,
                 elevation: elevation ? parseFloat(elevation) : null,
+                roadLength: roadLength ? parseFloat(roadLength) : null,
+                roadWidth: roadWidth ? parseFloat(roadWidth) : null,
                 imageryDate: imageryDate ? new Date(imageryDate) : null,
                 state,
                 description: description || null,

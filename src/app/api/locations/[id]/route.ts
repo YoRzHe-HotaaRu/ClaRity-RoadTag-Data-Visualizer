@@ -53,6 +53,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
             latitude,
             longitude,
             elevation,
+            roadLength,
+            roadWidth,
             imageryDate,
             state,
             description,
@@ -66,6 +68,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
                 ...(longitude !== undefined && { longitude: parseFloat(longitude) }),
                 ...(elevation !== undefined && {
                     elevation: elevation ? parseFloat(elevation) : null,
+                }),
+                ...(roadLength !== undefined && {
+                    roadLength: roadLength ? parseFloat(roadLength) : null,
+                }),
+                ...(roadWidth !== undefined && {
+                    roadWidth: roadWidth ? parseFloat(roadWidth) : null,
                 }),
                 ...(imageryDate !== undefined && {
                     imageryDate: imageryDate ? new Date(imageryDate) : null,

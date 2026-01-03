@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -9,6 +9,7 @@ export default function AdminLoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -26,8 +27,8 @@ export default function AdminLoginPage() {
             if (result?.error) {
                 setError("Invalid email or password");
             } else {
-                router.push("/admin");
-                router.refresh();
+                // Show welcome modal
+                setShowWelcome(true);
             }
         } catch {
             setError("An error occurred. Please try again.");
@@ -35,6 +36,17 @@ export default function AdminLoginPage() {
             setIsLoading(false);
         }
     };
+
+    // Redirect after showing welcome message
+    useEffect(() => {
+        if (showWelcome) {
+            const timer = setTimeout(() => {
+                router.push("/admin");
+                router.refresh();
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [showWelcome, router]);
 
     return (
         <main className="min-h-screen flex items-center justify-center bg-[var(--background)] px-4">
@@ -53,7 +65,7 @@ export default function AdminLoginPage() {
                 <div className="glass-card p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
-                            <div className="p-3 rounded-lg bg-[var(--error)]/10 border border-[var(--error)]/30 text-[var(--error)] text-sm">
+                            <div className="p-3 bg-[var(--destructive)]/10 border border-[var(--destructive)]/30 text-[var(--destructive)] text-sm">
                                 {error}
                             </div>
                         )}
@@ -120,6 +132,72 @@ export default function AdminLoginPage() {
                     </a>
                 </p>
             </div>
+
+            {/* Welcome Modal */}
+            {showWelcome && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+                    <div
+                        className="bg-[var(--card)] border border-[var(--border)] p-8 max-w-sm w-full mx-4 text-center animate-scaleIn"
+                        style={{
+                            animation: "scaleIn 0.3s ease-out forwards"
+                        }}
+                    >
+                        {/* Success Icon */}
+                        <div className="w-16 h-16 mx-auto mb-4 bg-[var(--primary)]/10 flex items-center justify-center">
+                            <svg
+                                className="w-8 h-8 text-[var(--primary)]"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </svg>
+                        </div>
+
+                        {/* Welcome Text */}
+                        <h2 className="text-xl font-bold mb-2">Welcome Back!</h2>
+                        <p className="text-[var(--muted-foreground)] text-sm mb-4">
+                            Authentication successful. Redirecting to dashboard...
+                        </p>
+
+                        {/* Loading indicator */}
+                        <div className="flex items-center justify-center gap-1">
+                            <span className="w-2 h-2 bg-[var(--primary)] animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <span className="w-2 h-2 bg-[var(--primary)] animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <span className="w-2 h-2 bg-[var(--primary)] animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Keyframe styles */}
+            <style jsx>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes scaleIn {
+                    from { 
+                        opacity: 0;
+                        transform: scale(0.9);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+                .animate-fadeIn {
+                    animation: fadeIn 0.2s ease-out forwards;
+                }
+                .animate-scaleIn {
+                    animation: scaleIn 0.3s ease-out forwards;
+                }
+            `}</style>
         </main>
     );
 }

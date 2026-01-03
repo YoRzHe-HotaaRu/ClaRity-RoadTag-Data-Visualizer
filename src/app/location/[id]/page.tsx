@@ -132,6 +132,22 @@ export default async function LocationDetailPage({ params }: PageProps) {
                                     <span className="font-medium">{location.elevation}m</span>
                                 </div>
                             )}
+                            {location.roadLength !== null && (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[var(--foreground-muted)]">
+                                        Road Length
+                                    </span>
+                                    <span className="font-medium">{location.roadLength}m</span>
+                                </div>
+                            )}
+                            {location.roadWidth !== null && (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[var(--foreground-muted)]">
+                                        Road Width
+                                    </span>
+                                    <span className="font-medium">{location.roadWidth}m</span>
+                                </div>
+                            )}
                             {location.imageryDate && (
                                 <div className="flex items-center justify-between">
                                     <span className="text-[var(--foreground-muted)]">

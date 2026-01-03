@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Location, Image } from "@prisma/client";
 import { MALAYSIAN_STATES } from "@/lib/constants";
 import { parseCoordinates, looksLikeCoordinates } from "@/lib/coordinates";
 import { CldUploadWidget } from "next-cloudinary";
 
-type LocationWithImages = Location & { images: Image[] };
+type LocationWithImages = Location & {
+    images: Image[];
+    roadLength?: number | null;
+    roadWidth?: number | null;
+};
 
 interface LocationFormProps {
     location?: LocationWithImages;
@@ -44,6 +48,12 @@ export default function LocationForm({ location }: LocationFormProps) {
             : ""
     );
     const [description, setDescription] = useState(location?.description || "");
+    const [roadLength, setRoadLength] = useState(
+        location?.roadLength?.toString() || ""
+    );
+    const [roadWidth, setRoadWidth] = useState(
+        location?.roadWidth?.toString() || ""
+    );
     const [images, setImages] = useState<UploadedImage[]>(
         location?.images.map((img) => ({
             publicId: img.publicId,
@@ -53,21 +63,89 @@ export default function LocationForm({ location }: LocationFormProps) {
         })) || []
     );
 
+    // Track newly uploaded images (not from existing location)
+    const newlyUploadedImages = useRef<string[]>([]);
+    const formSubmitted = useRef(false);
+
     const handleUploadSuccess = (result: any) => {
         const info = result.info;
-        setImages((prev) => [
-            ...prev,
-            {
-                publicId: info.public_id,
-                url: info.secure_url,
-                width: info.width,
-                height: info.height,
-            },
-        ]);
+        const newImage = {
+            publicId: info.public_id,
+            url: info.secure_url,
+            width: info.width,
+            height: info.height,
+        };
+        setImages((prev) => [...prev, newImage]);
+        // Track this as a newly uploaded image (for cleanup on cancel)
+        if (!isEditing || !location?.images.find(img => img.publicId === info.public_id)) {
+            newlyUploadedImages.current.push(info.public_id);
+        }
     };
 
-    const removeImage = (publicId: string) => {
+    // Cleanup function to delete all newly uploaded images
+    const cleanupNewImages = async () => {
+        if (formSubmitted.current) return; // Don't cleanup if form was submitted
+        for (const publicId of newlyUploadedImages.current) {
+            try {
+                await fetch(`/api/images/${encodeURIComponent(publicId)}`, {
+                    method: "DELETE",
+                });
+            } catch (error) {
+                console.error("Failed to cleanup image:", error);
+            }
+        }
+        newlyUploadedImages.current = [];
+    };
+
+    // Cleanup on page unload/refresh
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (newlyUploadedImages.current.length > 0 && !formSubmitted.current) {
+                // Use sendBeacon for reliable cleanup on page unload
+                for (const publicId of newlyUploadedImages.current) {
+                    navigator.sendBeacon(
+                        `/api/images/${encodeURIComponent(publicId)}`,
+                        new Blob([JSON.stringify({ _method: 'DELETE' })], { type: 'application/json' })
+                    );
+                }
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            // Cleanup when component unmounts (navigating away via Next.js router)
+            if (newlyUploadedImages.current.length > 0 && !formSubmitted.current) {
+                // Use sendBeacon for reliable cleanup
+                for (const publicId of newlyUploadedImages.current) {
+                    navigator.sendBeacon(
+                        `/api/images/${encodeURIComponent(publicId)}`,
+                        new Blob([JSON.stringify({ _method: 'DELETE' })], { type: 'application/json' })
+                    );
+                }
+            }
+        };
+    }, []);
+
+    const removeImage = async (publicId: string) => {
+        // Remove from local state immediately
         setImages((prev) => prev.filter((img) => img.publicId !== publicId));
+        // Remove from tracking
+        newlyUploadedImages.current = newlyUploadedImages.current.filter(id => id !== publicId);
+
+        // Delete from Cloudinary in background
+        try {
+            await fetch(`/api/images/${encodeURIComponent(publicId)}`, {
+                method: "DELETE",
+            });
+        } catch (error) {
+            console.error("Failed to delete image from Cloudinary:", error);
+        }
+    };
+
+    const handleCancel = async () => {
+        await cleanupNewImages();
+        router.back();
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -106,6 +184,8 @@ export default function LocationForm({ location }: LocationFormProps) {
             longitude,
             state,
             elevation: elevation || null,
+            roadLength: roadLength || null,
+            roadWidth: roadWidth || null,
             imageryDate: imageryDate || null,
             description: description || null,
             images: isEditing ? undefined : images,
@@ -130,6 +210,7 @@ export default function LocationForm({ location }: LocationFormProps) {
 
             router.push("/admin/locations");
             router.refresh();
+            formSubmitted.current = true; // Mark as submitted so cleanup doesn't run
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -211,6 +292,34 @@ export default function LocationForm({ location }: LocationFormProps) {
                                 onChange={(e) => setElevation(e.target.value)}
                                 className="input-field"
                                 placeholder="e.g., 45"
+                                step="0.01"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-2">
+                                Road Length (meters)
+                            </label>
+                            <input
+                                type="number"
+                                value={roadLength}
+                                onChange={(e) => setRoadLength(e.target.value)}
+                                className="input-field"
+                                placeholder="e.g., 500"
+                                step="0.01"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-2">
+                                Road Width (meters)
+                            </label>
+                            <input
+                                type="number"
+                                value={roadWidth}
+                                onChange={(e) => setRoadWidth(e.target.value)}
+                                className="input-field"
+                                placeholder="e.g., 10"
                                 step="0.01"
                             />
                         </div>
@@ -328,7 +437,7 @@ export default function LocationForm({ location }: LocationFormProps) {
             <div className="flex items-center justify-between">
                 <button
                     type="button"
-                    onClick={() => router.back()}
+                    onClick={handleCancel}
                     className="btn-secondary"
                 >
                     Cancel

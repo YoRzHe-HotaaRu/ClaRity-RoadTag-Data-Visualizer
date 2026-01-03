@@ -22,6 +22,8 @@ model Location {
   latitude    Float
   longitude   Float
   elevation   Float?    // elevation from sea level in meters
+  roadLength  Float?    // road length in meters
+  roadWidth   Float?    // road width in meters
   imageryDate DateTime?
   state       String    // Malaysian state
   description String?   // optional description
