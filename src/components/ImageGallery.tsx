@@ -39,9 +39,9 @@ export default function ImageGallery({ images, locationName }: ImageGalleryProps
 
     return (
         <>
-            <div className="mb-10">
-                <h2 className="text-lg font-semibold mb-4">Gallery</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="mb-6 md:mb-10">
+                <h2 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Gallery</h2>
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
                     {images.map((image, index) => (
                         <div
                             key={image.id}

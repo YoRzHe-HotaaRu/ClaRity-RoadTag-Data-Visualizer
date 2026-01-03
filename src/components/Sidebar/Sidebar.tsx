@@ -14,9 +14,11 @@ type LocationWithImage = Location & {
 
 interface SidebarProps {
     locations: LocationWithImage[];
+    onClose?: () => void;
+    isMobile?: boolean;
 }
 
-export default function Sidebar({ locations }: SidebarProps) {
+export default function Sidebar({ locations, onClose, isMobile }: SidebarProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedState, setSelectedState] = useState<string>("");
 
@@ -60,20 +62,38 @@ export default function Sidebar({ locations }: SidebarProps) {
             detail: { latitude: location.latitude, longitude: location.longitude },
         });
         window.dispatchEvent(event);
+        // Close sidebar on mobile after selecting
+        if (isMobile && onClose) {
+            onClose();
+        }
     };
 
     return (
-        <aside className="w-[360px] h-full flex flex-col bg-[var(--background-secondary)] border-r border-[var(--border)]">
+        <aside className="w-[320px] md:w-[360px] h-full flex flex-col bg-[var(--background-secondary)] border-r border-[var(--border)]">
             {/* Header */}
-            <div className="p-5 border-b border-[var(--border)]">
-                <h1 className="text-xl font-semibold gradient-text">RoadTag Data Visualizer</h1>
-                <p className="text-sm text-[var(--foreground-muted)] mt-1">
-                    Made by ClaRity
-                </p>
+            <div className="p-4 md:p-5 border-b border-[var(--border)] flex items-center justify-between">
+                <div>
+                    <h1 className="text-lg md:text-xl font-semibold gradient-text">RoadTag Data Visualizer</h1>
+                    <p className="text-xs md:text-sm text-[var(--foreground-muted)] mt-1">
+                        Made by ClaRity
+                    </p>
+                </div>
+                {/* Mobile close button */}
+                {isMobile && onClose && (
+                    <button
+                        onClick={onClose}
+                        className="md:hidden p-2 hover:bg-[var(--accent)] rounded transition-colors"
+                        aria-label="Close menu"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
             </div>
 
             {/* Search & Filter */}
-            <div className="p-4 space-y-3 border-b border-[var(--border)]">
+            <div className="p-3 md:p-4 space-y-2 md:space-y-3 border-b border-[var(--border)]">
                 <SearchBar value={searchQuery} onChange={setSearchQuery} />
                 <StateFilter value={selectedState} onChange={setSelectedState} />
             </div>

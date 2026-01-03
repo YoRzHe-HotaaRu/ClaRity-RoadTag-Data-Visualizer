@@ -34,7 +34,7 @@ export default async function LocationDetailPage({ params }: PageProps) {
         <main className="min-h-screen bg-[var(--background)]">
             {/* Header */}
             <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--background-secondary)] backdrop-blur-md">
-                <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="max-w-6xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
                     <Link
                         href="/"
                         className="flex items-center gap-2 text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
@@ -52,7 +52,7 @@ export default async function LocationDetailPage({ params }: PageProps) {
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
                             />
                         </svg>
-                        <span>Back to Map</span>
+                        <span className="hidden sm:inline">Back to Map</span>
                     </Link>
                     <span className="text-sm text-[var(--foreground-muted)]">
                         {location.state}
@@ -60,14 +60,14 @@ export default async function LocationDetailPage({ params }: PageProps) {
                 </div>
             </header>
 
-            <div className="max-w-6xl mx-auto px-6 py-8">
+            <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
                 {/* Title Section */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold gradient-text mb-2">
+                <div className="mb-6 md:mb-8">
+                    <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-2">
                         {location.name}
                     </h1>
                     {location.description && (
-                        <p className="text-[var(--foreground-muted)] max-w-2xl">
+                        <p className="text-sm md:text-base text-[var(--foreground-muted)] max-w-2xl">
                             {location.description}
                         </p>
                     )}
@@ -84,10 +84,10 @@ export default async function LocationDetailPage({ params }: PageProps) {
                 />
 
                 {/* Location Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     {/* Coordinates Card */}
-                    <div className="glass-card p-6">
-                        <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-4 uppercase tracking-wider">
+                    <div className="glass-card p-4 md:p-6">
+                        <h3 className="text-xs md:text-sm font-medium text-[var(--foreground-muted)] mb-3 md:mb-4 uppercase tracking-wider">
                             Coordinates
                         </h3>
                         <div className="space-y-3">

@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import MapContainer from "@/components/Map/MapContainer";
+import HomeClient from "@/components/HomeClient";
 
 export const dynamic = "force-dynamic";
 
@@ -25,15 +24,5 @@ async function getLocations() {
 export default async function Home() {
     const locations = await getLocations();
 
-    return (
-        <main className="flex h-screen w-full overflow-hidden">
-            {/* Left Sidebar */}
-            <Sidebar locations={locations} />
-
-            {/* Right Map */}
-            <div className="flex-1 relative">
-                <MapContainer locations={locations} />
-            </div>
-        </main>
-    );
+    return <HomeClient locations={locations} />;
 }

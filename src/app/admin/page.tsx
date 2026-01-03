@@ -34,24 +34,24 @@ export default async function AdminDashboard() {
         <div className="min-h-screen bg-[var(--background)]">
             <AdminHeader user={session.user} />
 
-            <main className="max-w-6xl mx-auto px-6 py-8">
+            <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
                 {/* Welcome */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold gradient-text">Dashboard</h1>
-                    <p className="text-[var(--foreground-muted)] mt-1">
+                <div className="mb-6 md:mb-8">
+                    <h1 className="text-xl md:text-2xl font-bold gradient-text">Dashboard</h1>
+                    <p className="text-sm md:text-base text-[var(--foreground-muted)] mt-1">
                         Welcome back, {session.user.name || session.user.email}
                     </p>
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div className="glass-card p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-10">
+                    <div className="glass-card p-4 md:p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[var(--foreground-muted)]">
+                                <p className="text-xs md:text-sm text-[var(--foreground-muted)]">
                                     Total Locations
                                 </p>
-                                <p className="text-3xl font-bold text-[var(--primary)] mt-1">
+                                <p className="text-2xl md:text-3xl font-bold text-[var(--primary)] mt-1">
                                     {locationCount}
                                 </p>
                             </div>
@@ -79,13 +79,13 @@ export default async function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-6">
+                    <div className="glass-card p-4 md:p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[var(--foreground-muted)]">
+                                <p className="text-xs md:text-sm text-[var(--foreground-muted)]">
                                     Total Images
                                 </p>
-                                <p className="text-3xl font-bold text-[var(--accent)] mt-1">
+                                <p className="text-2xl md:text-3xl font-bold text-[var(--accent)] mt-1">
                                     {imageCount}
                                 </p>
                             </div>
@@ -107,15 +107,15 @@ export default async function AdminDashboard() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-6">
+                    <div className="glass-card p-4 md:p-6 col-span-2 md:col-span-1">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[var(--foreground-muted)]">
+                                <p className="text-xs md:text-sm text-[var(--foreground-muted)]">
                                     Quick Action
                                 </p>
                                 <Link
                                     href="/admin/locations/new"
-                                    className="btn-primary mt-3 inline-block text-sm"
+                                    className="btn-primary mt-2 md:mt-3 inline-block text-xs md:text-sm"
                                 >
                                     + Add Location
                                 </Link>

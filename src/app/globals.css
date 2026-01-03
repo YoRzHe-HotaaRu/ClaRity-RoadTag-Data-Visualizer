@@ -6,9 +6,12 @@
 
 :root {
   --background: oklch(1.0000 0 0);
+  --background-secondary: #ffffff;
   --foreground: oklch(0.1448 0 0);
+  --foreground-muted: oklch(0.5486 0 0);
   --card: oklch(1.0000 0 0);
   --card-foreground: oklch(0.1448 0 0);
+  --card-hover: oklch(0.98 0 0);
   --popover: oklch(1.0000 0 0);
   --popover-foreground: oklch(0.1448 0 0);
   --primary: oklch(0.6633 0.1316 25.2246);
@@ -24,9 +27,9 @@
   --border: oklch(0.9219 0 0);
   --input: oklch(0.9219 0 0);
   --ring: oklch(0.7090 0 0);
-  --sidebar-background: oklch(0.9851 0 0);
-  --sidebar-foreground: oklch(0.1448 0 0);
-  --sidebar-border: oklch(0.9219 0 0);
+  --success: oklch(0.6 0.2 145);
+  --error: oklch(0.5830 0.2387 28.4765);
+  --warning: oklch(0.7 0.15 85);
 
   --font-sans: "Geist Mono", monospace;
   --font-mono: "Geist Mono", monospace;
@@ -232,11 +235,4 @@ body {
 
 .maplibregl-ctrl-group button+button {
   border-top-color: var(--border) !important;
-}
-
-/* Success color */
-:root {
-  --success: oklch(0.6 0.2 145);
-  --error: oklch(0.5830 0.2387 28.4765);
-  --warning: oklch(0.7 0.15 85);
 }
